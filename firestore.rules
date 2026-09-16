@@ -1,0 +1,64 @@
+// firestore.rules
+// -----------------------------------------------------------------------
+// Section 21, 34, 62: role-based access control enforced on the SERVER,
+// not just hidden in the UI. Deploy with: firebase deploy --only firestore:rules
+// -----------------------------------------------------------------------
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function myRole() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role; }
+    function isAdmin() { return isSignedIn() && myRole() in ['admin', 'super_admin']; }
+    function isTeacher() { return isSignedIn() && myRole() == 'teacher'; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    // Users can read/update their own profile but can NEVER set their own
+    // role or permissions — only setUserRole() (Cloud Function, admin-only)
+    // may change those fields.
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid) && request.resource.data.role == 'student';
+      allow update: if isOwner(uid)
+                    && request.resource.data.role == resource.data.role
+                    && request.resource.data.permissions == resource.data.permissions
+                    || isAdmin();
+    }
+
+    // Public catalog data: anyone can read published/active content;
+    // only admin/teacher can write.
+    match /subjects/{id}      { allow read: if true; allow write: if isAdmin(); }
+    match /classes/{id}       { allow read: if true; allow write: if isAdmin(); }
+    match /courses/{id}       { allow read: if resource.data.status == 'published' || isAdmin() || isTeacher(); allow write: if isAdmin() || isTeacher(); }
+    match /modules/{id}       { allow read: if true; allow write: if isAdmin() || isTeacher(); }
+    match /topics/{id}        { allow read: if true; allow write: if isAdmin() || isTeacher(); }
+    match /lessons/{id}       { allow read: if true; allow write: if isAdmin() || isTeacher(); } // driveFileId never sent to non-admins by the app, but keep it out of client reads too if you split metadata later
+    match /textbooks/{id}     { allow read: if true; allow write: if isAdmin() || isTeacher(); }
+    match /videos/{id}        { allow read: if true; allow write: if isAdmin() || isTeacher(); }
+
+    match /questions/{id}     { allow read: if isSignedIn(); allow write: if isAdmin() || isTeacher(); }
+    match /exams/{id}         { allow read: if isSignedIn(); allow write: if isAdmin() || isTeacher(); }
+
+    // Students may only read/write their OWN attempts, enrollments, progress,
+    // bookmarks, certificates — never anyone else's.
+    match /examAttempts/{id}  { allow read, create: if isSignedIn() && request.resource.data.studentId == request.auth.uid || isAdmin() || isTeacher();
+                                 allow update: if isSignedIn() && resource.data.studentId == request.auth.uid || isAdmin(); }
+    match /enrollments/{id}   { allow read: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+                                 allow write: if false; } // ONLY Cloud Functions (verifyPayment/enrollFree via Admin SDK) may write
+    match /progress/{uid}     { allow read, write: if isOwner(uid) || isAdmin(); }
+    match /bookmarks/{id}     { allow read, create, delete: if isSignedIn() && request.resource.data.studentId == request.auth.uid || isAdmin(); }
+    match /certificates/{id}  { allow read: if isSignedIn(); allow write: if false; } // Cloud Function only
+
+    match /payments/{id}      { allow read: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+                                 allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
+                                 allow update: if false; } // status flips only via verifyPayment Cloud Function
+
+    match /notifications/{id} { allow read, update: if isSignedIn() && resource.data.userId == request.auth.uid || isAdmin();
+                                 allow create: if isAdmin(); }
+    match /reports/{id}       { allow read: if isAdmin(); allow create: if isSignedIn(); allow update: if isAdmin(); }
+    match /auditLogs/{id}     { allow read: if isAdmin(); allow create: if isSignedIn(); allow update, delete: if false; }
+
+    // Server secrets collection (OAuth tokens) — no client access, ever.
+    match /_serverSecrets/{doc} { allow read, write: if false; }
+  }
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Scholar's Camp — Learn. Practice. Master.</title>
+<meta name="description" content="Scholar's Camp: a professional online learning platform for secondary-school exam preparation." />
+<meta name="theme-color" content="#0F172A" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon-192.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="stylesheet" href="styles.css" />
+
+<!-- Firebase (Auth + Firestore) via CDN — no build step, keeps this a single flat folder -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <div id="app-shell">
+    <!-- Top bar -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <button id="hamburger" class="icon-btn" aria-label="Menu">☰</button>
+        <a href="#/" class="brand">
+          <span class="brand-mark">SC</span>
+          <span class="brand-text">Scholar's Camp</span>
+        </a>
+      </div>
+      <div class="topbar-search">
+        <input id="global-search" type="search" placeholder="Search courses, topics, textbooks, questions…" />
+      </div>
+      <div class="topbar-right">
+        <button id="theme-toggle" class="icon-btn" title="Toggle dark mode">🌙</button>
+        <div id="notif-bell" class="icon-btn" title="Notifications">🔔<span id="notif-count" class="badge hidden">0</span></div>
+        <div id="auth-area"><!-- login/register buttons OR user menu injected by auth.js --></div>
+      </div>
+    </header>
+
+    <div id="layout">
+      <!-- Sidebar: content injected per-role by router.js -->
+      <nav id="sidebar" aria-label="Primary"></nav>
+
+      <!-- Main routed content -->
+      <main id="view"></main>
+    </div>
+
+    <!-- Mobile bottom nav -->
+    <nav id="mobile-nav" aria-label="Mobile primary"></nav>
+  </div>
+
+  <div id="toast-root" aria-live="polite"></div>
+
+  <!-- App scripts (flat, load order matters) -->
+  <script src="firebase-config.js"></script>
+  <script src="data-models.js"></script>
+  <script src="store.js"></script>
+  <script src="auth.js"></script>
+  <script src="drive-service.js"></script>
+  <script src="payments.js"></script>
+  <script src="video-player.js"></script>
+  <script src="pdf-viewer.js"></script>
+  <script src="questions.js"></script>
+  <script src="exam-engine.js"></script>
+  <script src="courses.js"></script>
+  <script src="notifications.js"></script>
+  <script src="certificates.js"></script>
+  <script src="admin.js"></script>
+  <script src="student.js"></script>
+  <script src="study-exam-mode.js"></script>
+  <script src="auth-ui.js"></script>
+  <script src="router.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
