@@ -98,7 +98,7 @@ const DriveService = (() => {
    * code exchange happens entirely on the server; the browser only opens
    * Google's consent screen and forwards the one-time `code`. */
   function beginGoogleDriveOAuth() {
-    const clientId = "REPLACE_WITH_YOUR_OAUTH_CLIENT_ID";
+    const clientId = "1031110157009-9r1rums30qqbmh8rgf7s88mkv5o6onup.apps.googleusercontent.com";
     const redirectUri = `${window.location.origin}/#/admin/settings/drive-callback`;
     const scope = encodeURIComponent("https://www.googleapis.com/auth/drive.readonly");
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&access_type=offline&prompt=consent`;
