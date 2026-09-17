@@ -20,12 +20,12 @@
  */
 
 const firebaseConfig = {
-  apiKey: "REPLACE_WITH_YOUR_FIREBASE_WEB_API_KEY",
-  authDomain: "REPLACE_ME.firebaseapp.com",
-  projectId: "REPLACE_ME",
-  storageBucket: "REPLACE_ME.appspot.com",
-  messagingSenderId: "REPLACE_ME",
-  appId: "REPLACE_ME",
+  apiKey: "AIzaSyBPW1nbDhLjhX7AM-czB_4r7IB5vStgFd4",
+  authDomain: "scamp-e44bb.firebaseapp.com",
+  projectId: "scamp-e44bb",
+  storageBucket: "scamp-e44bb.firebasestorage.app",
+  messagingSenderId: "586375503723",
+  appId: "1:586375503723:web:44f8b814ebb7521d15762e"
 };
 
 firebase.initializeApp(firebaseConfig);
