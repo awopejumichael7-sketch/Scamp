@@ -25,7 +25,7 @@ const firebaseConfig = {
   projectId: "scamp-e44bb",
   storageBucket: "scamp-e44bb.firebasestorage.app",
   messagingSenderId: "586375503723",
-  appId: "1:586375503723:web:44f8b814ebb7521d15762e"
+  appId: "1:586375503723:web:44f8b814ebb7521d15762e",
 };
 
 firebase.initializeApp(firebaseConfig);
